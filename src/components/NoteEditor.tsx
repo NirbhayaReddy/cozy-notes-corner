@@ -16,7 +16,7 @@ export const NoteEditor = () => {
       StarterKit,
       Highlight,
     ],
-    content: selectedNote?.content || '<p>Start typing...</p>',
+    content: selectedNote?.content || '',
     onUpdate: ({ editor }) => {
       if (selectedNote) {
         updateNote(selectedNote.id, { content: editor.getHTML() });
