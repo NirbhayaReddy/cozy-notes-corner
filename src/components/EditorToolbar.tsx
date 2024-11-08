@@ -57,8 +57,14 @@ export const EditorToolbar = ({ editor, onAI, onDownload, onShare }: EditorToolb
       case 'highlight':
         editor.chain().focus().toggleHighlight().run();
         break;
+      default:
+        break;
     }
   };
+
+  if (!editor) {
+    return null;
+  }
 
   return (
     <div className="flex items-center justify-between space-x-2 mb-4 border-b pb-4">
@@ -75,7 +81,8 @@ export const EditorToolbar = ({ editor, onAI, onDownload, onShare }: EditorToolb
           variant="ghost" 
           size="icon" 
           onClick={() => handleFormat('h1')}
-          className={editor?.isActive('heading', { level: 1 }) ? 'bg-accent' : ''}
+          data-active={editor.isActive('heading', { level: 1 })}
+          className={editor.isActive('heading', { level: 1 }) ? 'bg-accent' : ''}
         >
           <Heading1 className="h-4 w-4" />
         </Button>
@@ -83,7 +90,8 @@ export const EditorToolbar = ({ editor, onAI, onDownload, onShare }: EditorToolb
           variant="ghost" 
           size="icon" 
           onClick={() => handleFormat('h2')}
-          className={editor?.isActive('heading', { level: 2 }) ? 'bg-accent' : ''}
+          data-active={editor.isActive('heading', { level: 2 })}
+          className={editor.isActive('heading', { level: 2 }) ? 'bg-accent' : ''}
         >
           <Heading2 className="h-4 w-4" />
         </Button>
@@ -91,7 +99,8 @@ export const EditorToolbar = ({ editor, onAI, onDownload, onShare }: EditorToolb
           variant="ghost" 
           size="icon" 
           onClick={() => handleFormat('bold')}
-          className={editor?.isActive('bold') ? 'bg-accent' : ''}
+          data-active={editor.isActive('bold')}
+          className={editor.isActive('bold') ? 'bg-accent' : ''}
         >
           <Bold className="h-4 w-4" />
         </Button>
@@ -99,7 +108,8 @@ export const EditorToolbar = ({ editor, onAI, onDownload, onShare }: EditorToolb
           variant="ghost" 
           size="icon" 
           onClick={() => handleFormat('italic')}
-          className={editor?.isActive('italic') ? 'bg-accent' : ''}
+          data-active={editor.isActive('italic')}
+          className={editor.isActive('italic') ? 'bg-accent' : ''}
         >
           <Italic className="h-4 w-4" />
         </Button>
@@ -107,7 +117,8 @@ export const EditorToolbar = ({ editor, onAI, onDownload, onShare }: EditorToolb
           variant="ghost" 
           size="icon" 
           onClick={() => handleFormat('highlight')}
-          className={editor?.isActive('highlight') ? 'bg-accent' : ''}
+          data-active={editor.isActive('highlight')}
+          className={editor.isActive('highlight') ? 'bg-accent' : ''}
         >
           <Highlighter className="h-4 w-4" />
         </Button>
