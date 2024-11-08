@@ -8,13 +8,17 @@ import {
   Highlighter, 
   Bot, 
   Download, 
-  Share2 
+  Share2,
+  Home,
+  Book
 } from 'lucide-react';
 import { toast } from "sonner";
+import { useNavigate } from 'react-router-dom';
 
 export const NoteEditor = () => {
   const { notes, selectedNoteId, updateNote } = useNoteStore();
   const selectedNote = notes.find((note) => note.id === selectedNoteId);
+  const navigate = useNavigate();
 
   const handleFormat = (format: string) => {
     if (!selectedNote) return;
@@ -25,32 +29,41 @@ export const NoteEditor = () => {
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
     const text = selectedNote.content;
+    const selectedText = text.slice(start, end);
     
     let newText = text;
     switch (format) {
       case 'h1':
-        newText = text.slice(0, start) + '# ' + text.slice(start);
+        newText = text.slice(0, start) + '# ' + selectedText + text.slice(end);
         break;
       case 'h2':
-        newText = text.slice(0, start) + '## ' + text.slice(start);
+        newText = text.slice(0, start) + '## ' + selectedText + text.slice(end);
         break;
       case 'bold':
-        newText = text.slice(0, start) + '**' + text.slice(start, end) + '**' + text.slice(end);
+        newText = text.slice(0, start) + '**' + selectedText + '**' + text.slice(end);
         break;
       case 'italic':
-        newText = text.slice(0, start) + '_' + text.slice(start, end) + '_' + text.slice(end);
+        newText = text.slice(0, start) + '_' + selectedText + '_' + text.slice(end);
         break;
       case 'highlight':
-        newText = text.slice(0, start) + '==' + text.slice(start, end) + '==' + text.slice(end);
+        newText = text.slice(0, start) + '==' + selectedText + '==' + text.slice(end);
         break;
     }
     
     updateNote(selectedNote.id, { content: newText });
+    
+    // Restore cursor position
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(
+        start + (format === 'h1' || format === 'h2' ? 2 : 2),
+        end + (format === 'h1' || format === 'h2' ? 2 : 2)
+      );
+    }, 0);
   };
 
   const handleAI = () => {
     toast.info("AI Assistant is being called...");
-    // AI functionality to be implemented
   };
 
   const handleDownload = () => {
@@ -88,31 +101,41 @@ export const NoteEditor = () => {
 
   return (
     <div className="flex-1 flex flex-col p-6 animate-fade-in">
-      <div className="flex items-center space-x-2 mb-4 border-b pb-4">
-        <Button variant="ghost" size="icon" onClick={() => handleFormat('h1')}>
-          <Heading1 className="h-4 w-4" />
-        </Button>
-        <Button variant="ghost" size="icon" onClick={() => handleFormat('h2')}>
-          <Heading2 className="h-4 w-4" />
-        </Button>
-        <Button variant="ghost" size="icon" onClick={() => handleFormat('bold')}>
-          <Bold className="h-4 w-4" />
-        </Button>
-        <Button variant="ghost" size="icon" onClick={() => handleFormat('italic')}>
-          <Italic className="h-4 w-4" />
-        </Button>
-        <Button variant="ghost" size="icon" onClick={() => handleFormat('highlight')}>
-          <Highlighter className="h-4 w-4" />
-        </Button>
-        <Button variant="ghost" size="icon" onClick={handleAI}>
-          <Bot className="h-4 w-4" />
-        </Button>
-        <Button variant="ghost" size="icon" onClick={handleDownload}>
-          <Download className="h-4 w-4" />
-        </Button>
-        <Button variant="ghost" size="icon" onClick={handleShare}>
-          <Share2 className="h-4 w-4" />
-        </Button>
+      <div className="flex items-center justify-between space-x-2 mb-4 border-b pb-4">
+        <div className="flex items-center space-x-2">
+          <Button variant="ghost" size="icon" onClick={() => navigate('/')}>
+            <Home className="h-4 w-4" />
+          </Button>
+          <Button variant="ghost" size="icon" onClick={() => navigate('/all-notes')}>
+            <Book className="h-4 w-4" />
+          </Button>
+        </div>
+        <div className="flex items-center space-x-2">
+          <Button variant="ghost" size="icon" onClick={() => handleFormat('h1')}>
+            <Heading1 className="h-4 w-4" />
+          </Button>
+          <Button variant="ghost" size="icon" onClick={() => handleFormat('h2')}>
+            <Heading2 className="h-4 w-4" />
+          </Button>
+          <Button variant="ghost" size="icon" onClick={() => handleFormat('bold')}>
+            <Bold className="h-4 w-4" />
+          </Button>
+          <Button variant="ghost" size="icon" onClick={() => handleFormat('italic')}>
+            <Italic className="h-4 w-4" />
+          </Button>
+          <Button variant="ghost" size="icon" onClick={() => handleFormat('highlight')}>
+            <Highlighter className="h-4 w-4" />
+          </Button>
+          <Button variant="ghost" size="icon" onClick={handleAI}>
+            <Bot className="h-4 w-4" />
+          </Button>
+          <Button variant="ghost" size="icon" onClick={handleDownload}>
+            <Download className="h-4 w-4" />
+          </Button>
+          <Button variant="ghost" size="icon" onClick={handleShare}>
+            <Share2 className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
 
       <input
