@@ -71,19 +71,44 @@ export const EditorToolbar = ({ editor, onAI, onDownload, onShare }: EditorToolb
         </Button>
       </div>
       <div className="flex items-center space-x-2">
-        <Button variant="ghost" size="icon" onClick={() => handleFormat('h1')}>
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          onClick={() => handleFormat('h1')}
+          className={editor?.isActive('heading', { level: 1 }) ? 'bg-accent' : ''}
+        >
           <Heading1 className="h-4 w-4" />
         </Button>
-        <Button variant="ghost" size="icon" onClick={() => handleFormat('h2')}>
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          onClick={() => handleFormat('h2')}
+          className={editor?.isActive('heading', { level: 2 }) ? 'bg-accent' : ''}
+        >
           <Heading2 className="h-4 w-4" />
         </Button>
-        <Button variant="ghost" size="icon" onClick={() => handleFormat('bold')}>
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          onClick={() => handleFormat('bold')}
+          className={editor?.isActive('bold') ? 'bg-accent' : ''}
+        >
           <Bold className="h-4 w-4" />
         </Button>
-        <Button variant="ghost" size="icon" onClick={() => handleFormat('italic')}>
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          onClick={() => handleFormat('italic')}
+          className={editor?.isActive('italic') ? 'bg-accent' : ''}
+        >
           <Italic className="h-4 w-4" />
         </Button>
-        <Button variant="ghost" size="icon" onClick={() => handleFormat('highlight')}>
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          onClick={() => handleFormat('highlight')}
+          className={editor?.isActive('highlight') ? 'bg-accent' : ''}
+        >
           <Highlighter className="h-4 w-4" />
         </Button>
         <Button variant="ghost" size="icon" onClick={onAI}>
