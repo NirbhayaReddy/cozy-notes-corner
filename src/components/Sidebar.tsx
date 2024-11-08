@@ -1,15 +1,11 @@
 import { NotebookText, Plus, Trash2 } from 'lucide-react';
 import { useNoteStore, type Note } from '@/lib/store';
-import { SearchBar } from './SearchBar';
 import { format } from 'date-fns';
+import { useNavigate } from 'react-router-dom';
 
 export const Sidebar = () => {
-  const { notes, selectedNoteId, searchQuery, addNote, deleteNote, selectNote } = useNoteStore();
-
-  const filteredNotes = notes.filter((note) =>
-    note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    note.content.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const { notes, selectedNoteId, addNote, deleteNote, selectNote } = useNoteStore();
+  const navigate = useNavigate();
 
   return (
     <div className="w-64 h-screen border-r border-warm-gray-200 bg-paper flex flex-col">
@@ -28,18 +24,18 @@ export const Sidebar = () => {
               <Plus className="h-5 w-5 text-warm-gray-600" />
             </button>
             <button
+              onClick={() => navigate('/all-notes')}
               className="p-1 hover:bg-warm-gray-100 rounded-md transition-colors"
-              aria-label="Add workspace"
+              aria-label="View all notes"
             >
               <NotebookText className="h-5 w-5 text-warm-gray-600" />
             </button>
           </div>
         </div>
-        <SearchBar />
       </div>
       
       <div className="flex-1 overflow-y-auto">
-        {filteredNotes.map((note) => (
+        {notes.map((note) => (
           <div
             key={note.id}
             className={`p-4 border-b border-warm-gray-200 cursor-pointer transition-colors ${

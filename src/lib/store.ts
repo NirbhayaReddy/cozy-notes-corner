@@ -11,18 +11,15 @@ export interface Note {
 interface NoteStore {
   notes: Note[];
   selectedNoteId: string | null;
-  searchQuery: string;
   addNote: () => void;
   deleteNote: (id: string) => void;
   updateNote: (id: string, updates: Partial<Omit<Note, 'id' | 'createdAt'>>) => void;
   selectNote: (id: string | null) => void;
-  setSearchQuery: (query: string) => void;
 }
 
 export const useNoteStore = create<NoteStore>((set) => ({
   notes: [],
   selectedNoteId: null,
-  searchQuery: '',
   
   addNote: () => set((state) => {
     const newNote: Note = {
@@ -52,6 +49,4 @@ export const useNoteStore = create<NoteStore>((set) => ({
   })),
 
   selectNote: (id) => set({ selectedNoteId: id }),
-  
-  setSearchQuery: (query) => set({ searchQuery: query }),
 }));
