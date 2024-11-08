@@ -5,16 +5,18 @@ const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
 
 if (!apiKey) {
   console.error('OpenAI API key is not configured. Please add VITE_OPENAI_API_KEY to your environment variables.');
+  toast.error("OpenAI API key is missing. Please configure it in your environment variables.");
 }
 
-const openai = new OpenAI({
+// Only create OpenAI instance if API key exists
+const openai = apiKey ? new OpenAI({
   apiKey: apiKey,
   dangerouslyAllowBrowser: true
-});
+}) : null;
 
 export const processWithAI = async (content: string, pdfFile?: File) => {
   try {
-    if (!apiKey) {
+    if (!openai || !apiKey) {
       throw new Error('OpenAI API key is not configured');
     }
 
