@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { Editor } from '@tiptap/react';
 import { useNavigate } from 'react-router-dom';
+import { useNoteStore } from '@/lib/store';
 
 interface EditorToolbarProps {
   editor: Editor | null;
@@ -23,6 +24,12 @@ interface EditorToolbarProps {
 
 export const EditorToolbar = ({ editor, onAI, onDownload, onShare }: EditorToolbarProps) => {
   const navigate = useNavigate();
+  const { setSelectedPdfId } = useNoteStore();
+
+  const handleHomeClick = () => {
+    setSelectedPdfId(null);
+    navigate('/');
+  };
 
   const handleFormat = (format: string) => {
     if (!editor) return;
@@ -49,7 +56,7 @@ export const EditorToolbar = ({ editor, onAI, onDownload, onShare }: EditorToolb
   return (
     <div className="flex items-center justify-between space-x-2 mb-4 border-b pb-4">
       <div className="flex items-center space-x-2">
-        <Button variant="ghost" size="icon" onClick={() => navigate('/')}>
+        <Button variant="ghost" size="icon" onClick={handleHomeClick}>
           <Home className="h-4 w-4" />
         </Button>
         <Button variant="ghost" size="icon" onClick={() => navigate('/all-notes')}>
