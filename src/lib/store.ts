@@ -6,6 +6,7 @@ export interface Note {
   content: string;
   createdAt: Date;
   updatedAt: Date;
+  pdfId?: string; // Associate notes with PDFs
 }
 
 export interface PDF {
@@ -18,10 +19,12 @@ interface NoteStore {
   notes: Note[];
   pdfs: PDF[];
   selectedNoteId: string | null;
-  addNote: () => void;
+  selectedPdfId: string | null;
+  addNote: (pdfId?: string) => void;
   deleteNote: (id: string) => void;
   updateNote: (id: string, updates: Partial<Omit<Note, 'id' | 'createdAt'>>) => void;
   selectNote: (id: string | null) => void;
+  selectPdf: (id: string | null) => void;
   addPdf: (file: File) => void;
   deletePdf: (id: string) => void;
 }
@@ -30,14 +33,16 @@ export const useNoteStore = create<NoteStore>((set) => ({
   notes: [],
   pdfs: [],
   selectedNoteId: null,
+  selectedPdfId: null,
   
-  addNote: () => set((state) => {
+  addNote: (pdfId) => set((state) => {
     const newNote: Note = {
       id: Date.now().toString(),
       title: 'Untitled Note',
       content: '',
       createdAt: new Date(),
       updatedAt: new Date(),
+      pdfId,
     };
     return {
       notes: [newNote, ...state.notes],
@@ -59,6 +64,8 @@ export const useNoteStore = create<NoteStore>((set) => ({
   })),
 
   selectNote: (id) => set({ selectedNoteId: id }),
+  
+  selectPdf: (id) => set({ selectedPdfId: id }),
 
   addPdf: (file) => set((state) => ({
     pdfs: [{

@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from "sonner";
 
 export const Sidebar = () => {
-  const { pdfs, addPdf, deletePdf } = useNoteStore();
+  const { pdfs, addPdf, deletePdf, selectPdf, addNote, selectedPdfId } = useNoteStore();
   const navigate = useNavigate();
 
   const handlePdfUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -18,6 +18,11 @@ export const Sidebar = () => {
         toast.error('Please upload a PDF file');
       }
     }
+  };
+
+  const handlePdfClick = (pdfId: string) => {
+    selectPdf(pdfId);
+    addNote(pdfId);
   };
 
   return (
@@ -56,14 +61,20 @@ export const Sidebar = () => {
         {pdfs.map((pdf) => (
           <div
             key={pdf.id}
-            className="p-4 border-b border-warm-gray-200 hover:bg-warm-gray-50"
+            className={`p-4 border-b border-warm-gray-200 cursor-pointer ${
+              selectedPdfId === pdf.id ? 'bg-warm-gray-100' : 'hover:bg-warm-gray-50'
+            }`}
+            onClick={() => handlePdfClick(pdf.id)}
           >
             <div className="flex items-center justify-between">
               <h3 className="font-medium text-warm-gray-800 truncate">
                 {pdf.name}
               </h3>
               <button
-                onClick={() => deletePdf(pdf.id)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  deletePdf(pdf.id);
+                }}
                 className="p-1 opacity-0 group-hover:opacity-100 hover:bg-warm-gray-200 rounded-md transition-all"
                 aria-label="Delete PDF"
               >
