@@ -19,8 +19,9 @@ import StarterKit from '@tiptap/starter-kit';
 import Highlight from '@tiptap/extension-highlight';
 import OpenAI from 'openai';
 
+// Initialize OpenAI with a check for API key
 const openai = new OpenAI({
-  apiKey: import.meta.env.VITE_OPENAI_API_KEY,
+  apiKey: import.meta.env.VITE_OPENAI_API_KEY || '',
   dangerouslyAllowBrowser: true
 });
 
@@ -65,6 +66,11 @@ export const NoteEditor = () => {
   };
 
   const handleAI = async () => {
+    if (!import.meta.env.VITE_OPENAI_API_KEY) {
+      toast.error("OpenAI API key is not configured. Please add VITE_OPENAI_API_KEY to your environment.");
+      return;
+    }
+
     if (!selectedNote?.content || !selectedNote?.pdfId) {
       toast.error("Please select a note with associated PDF first");
       return;
@@ -95,7 +101,7 @@ export const NoteEditor = () => {
         toast.success("AI response added to your note!");
       }
     } catch (error) {
-      toast.error("Failed to get AI response. Please try again.");
+      toast.error("Failed to get AI response. Please check your API key and try again.");
     }
   };
 
