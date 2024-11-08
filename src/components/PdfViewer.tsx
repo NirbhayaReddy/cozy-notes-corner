@@ -25,10 +25,10 @@ export const PdfViewer = () => {
   }
 
   return (
-    <div className="flex-1 p-4">
+    <div className="h-screen w-full">
       <iframe
         src={pdfUrl}
-        className="w-full h-full border rounded-lg"
+        className="w-full h-full border-none"
         title={selectedPdf.name}
       />
     </div>

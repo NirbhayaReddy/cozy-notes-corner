@@ -8,13 +8,13 @@ const Index = () => {
 
   return (
     <div className="flex h-screen bg-paper">
-      <Sidebar />
+      {!selectedPdfId && <Sidebar />}
       {selectedPdfId ? (
         <div className="flex flex-1">
           <div className="w-1/2 border-r border-warm-gray-200">
             <NoteEditor />
           </div>
-          <div className="w-1/2">
+          <div className="w-1/2 h-screen">
             <PdfViewer />
           </div>
         </div>
