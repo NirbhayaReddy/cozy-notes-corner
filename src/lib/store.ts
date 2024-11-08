@@ -26,6 +26,7 @@ interface NoteStore {
   updateNote: (id: string, updates: Partial<Omit<Note, 'id' | 'createdAt'>>) => void;
   selectNote: (id: string | null) => void;
   selectPdf: (id: string | null) => void;
+  setSelectedPdfId: (id: string | null) => void; // Add this method
   addPdf: (file: File) => void;
   deletePdf: (id: string) => void;
 }
@@ -67,6 +68,8 @@ export const useNoteStore = create<NoteStore>((set) => ({
   selectNote: (id) => set({ selectedNoteId: id }),
   
   selectPdf: (id) => set({ selectedPdfId: id }),
+
+  setSelectedPdfId: (id) => set({ selectedPdfId: id }), // Add this method
 
   addPdf: (file) => set((state) => ({
     pdfs: [{
