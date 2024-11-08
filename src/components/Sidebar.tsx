@@ -21,16 +21,17 @@ export const Sidebar = () => {
   return (
     <div className="w-64 h-screen border-r border-warm-gray-200 bg-paper flex flex-col">
       <div className="p-4 space-y-4">
-        <label className="w-full">
+        <label htmlFor="pdf-upload" className="w-full">
+          <input
+            id="pdf-upload"
+            type="file"
+            accept=".pdf"
+            onChange={handlePdfUpload}
+            className="hidden"
+          />
           <Button className="w-full flex items-center justify-center gap-2" variant="outline">
             <FileUp className="h-5 w-5" />
             Upload PDF File
-            <input
-              type="file"
-              accept=".pdf"
-              onChange={handlePdfUpload}
-              className="hidden"
-            />
           </Button>
         </label>
         
