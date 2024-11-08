@@ -1,19 +1,29 @@
 import OpenAI from 'openai';
 import { toast } from "sonner";
 
+const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
+
+if (!apiKey) {
+  console.error('OpenAI API key is not configured. Please add VITE_OPENAI_API_KEY to your environment variables.');
+}
+
 const openai = new OpenAI({
-  apiKey: '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',
+  apiKey: apiKey,
   dangerouslyAllowBrowser: true
 });
 
 export const processWithAI = async (content: string, pdfFile?: File) => {
   try {
+    if (!apiKey) {
+      throw new Error('OpenAI API key is not configured');
+    }
+
     if (pdfFile) {
       const response = await openai.chat.completions.create({
         model: "gpt-4-vision-preview",
         messages: [
           {
-            role: "user" as const,
+            role: "user",
             content: [
               { type: "text", text: content },
               {
@@ -35,11 +45,11 @@ export const processWithAI = async (content: string, pdfFile?: File) => {
         model: "gpt-4",
         messages: [
           {
-            role: "system" as const,
+            role: "system",
             content: "You are a helpful assistant that answers questions based on the content provided."
           },
           {
-            role: "user" as const,
+            role: "user",
             content: content
           }
         ]
