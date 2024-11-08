@@ -13,6 +13,7 @@ export interface PDF {
   id: string;
   name: string;
   uploadedAt: Date;
+  file: File;
 }
 
 interface NoteStore {
@@ -71,7 +72,8 @@ export const useNoteStore = create<NoteStore>((set) => ({
     pdfs: [{
       id: Date.now().toString(),
       name: file.name,
-      uploadedAt: new Date()
+      uploadedAt: new Date(),
+      file: file
     }, ...state.pdfs]
   })),
 
