@@ -25,13 +25,13 @@ export const Sidebar = () => {
           <Button className="w-full flex items-center justify-center gap-2" variant="outline">
             <FileUp className="h-5 w-5" />
             Upload PDF File
+            <input
+              type="file"
+              accept=".pdf"
+              onChange={handlePdfUpload}
+              className="hidden"
+            />
           </Button>
-          <input
-            type="file"
-            accept=".pdf"
-            onChange={handlePdfUpload}
-            className="hidden"
-          />
         </label>
         
         <Button className="w-full flex items-center justify-center gap-2" variant="outline">
