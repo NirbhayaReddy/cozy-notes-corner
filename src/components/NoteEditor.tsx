@@ -19,9 +19,8 @@ import StarterKit from '@tiptap/starter-kit';
 import Highlight from '@tiptap/extension-highlight';
 import OpenAI from 'openai';
 
-// Initialize OpenAI with a check for API key
 const openai = new OpenAI({
-  apiKey: import.meta.env.VITE_OPENAI_API_KEY || '',
+  apiKey: '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',
   dangerouslyAllowBrowser: true
 });
 
