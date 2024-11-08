@@ -25,8 +25,9 @@ const openai = new OpenAI({
 });
 
 export const NoteEditor = () => {
-  const { notes, selectedNoteId, updateNote } = useNoteStore();
+  const { notes, selectedNoteId, updateNote, pdfs, selectedPdfId } = useNoteStore();
   const selectedNote = notes.find((note) => note.id === selectedNoteId);
+  const selectedPdf = pdfs.find((pdf) => pdf.id === selectedPdfId);
   const navigate = useNavigate();
 
   const editor = useEditor({
@@ -65,42 +66,78 @@ export const NoteEditor = () => {
   };
 
   const handleAI = async () => {
-    if (!import.meta.env.VITE_OPENAI_API_KEY) {
-      toast.error("OpenAI API key is not configured. Please add VITE_OPENAI_API_KEY to your environment.");
+    if (!selectedNote?.content) {
+      toast.error("Please write some text in your note first");
       return;
     }
 
-    if (!selectedNote?.content || !selectedNote?.pdfId) {
-      toast.error("Please select a note with associated PDF first");
-      return;
-    }
-
-    toast.info("AI Assistant is analyzing your note...");
+    toast.info("AI Assistant is analyzing your content...");
 
     try {
-      const completion = await openai.chat.completions.create({
-        model: "gpt-4",
-        messages: [
-          {
-            role: "system",
-            content: "You are a helpful assistant that answers questions based on the content provided."
-          },
-          {
-            role: "user",
-            content: selectedNote.content
-          }
-        ]
-      });
+      let messages = [
+        {
+          role: "system",
+          content: "You are a helpful assistant that answers questions based on the content provided."
+        }
+      ];
 
-      const response = completion.choices[0]?.message?.content;
-      if (response) {
-        updateNote(selectedNote.id, { 
-          content: selectedNote.content + "\n\nAI Response:\n" + response 
+      // If there's a PDF selected, we'll include its content
+      if (selectedPdf?.file) {
+        const formData = new FormData();
+        formData.append('file', selectedPdf.file);
+        formData.append('model', 'gpt-4-vision-preview');
+
+        const response = await openai.chat.completions.create({
+          model: "gpt-4-vision-preview",
+          messages: [
+            {
+              role: "user",
+              content: [
+                { type: "text", text: selectedNote.content },
+                {
+                  type: "image_url",
+                  image_url: {
+                    url: URL.createObjectURL(selectedPdf.file),
+                    detail: "high"
+                  }
+                }
+              ],
+            },
+          ],
+          max_tokens: 4096,
         });
-        toast.success("AI response added to your note!");
+
+        const aiResponse = response.choices[0]?.message?.content;
+        if (aiResponse) {
+          updateNote(selectedNote.id, { 
+            content: selectedNote.content + "\n\nAI Response:\n" + aiResponse 
+          });
+          toast.success("AI response added to your note!");
+        }
+      } else {
+        // If no PDF, just process the note content
+        const completion = await openai.chat.completions.create({
+          model: "gpt-4",
+          messages: [
+            ...messages,
+            {
+              role: "user",
+              content: selectedNote.content
+            }
+          ]
+        });
+
+        const response = completion.choices[0]?.message?.content;
+        if (response) {
+          updateNote(selectedNote.id, { 
+            content: selectedNote.content + "\n\nAI Response:\n" + response 
+          });
+          toast.success("AI response added to your note!");
+        }
       }
     } catch (error) {
-      toast.error("Failed to get AI response. Please check your API key and try again.");
+      console.error('OpenAI API Error:', error);
+      toast.error("Failed to get AI response. Please try again.");
     }
   };
 
