@@ -19,13 +19,21 @@ export const Sidebar = () => {
             <NotebookText className="h-6 w-6 text-warm-gray-600" />
             <h1 className="font-semibold text-warm-gray-800">Notes</h1>
           </div>
-          <button
-            onClick={() => addNote()}
-            className="p-1 hover:bg-warm-gray-100 rounded-md transition-colors"
-            aria-label="New note"
-          >
-            <Plus className="h-5 w-5 text-warm-gray-600" />
-          </button>
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={() => addNote()}
+              className="p-1 hover:bg-warm-gray-100 rounded-md transition-colors"
+              aria-label="New note"
+            >
+              <Plus className="h-5 w-5 text-warm-gray-600" />
+            </button>
+            <button
+              className="p-1 hover:bg-warm-gray-100 rounded-md transition-colors"
+              aria-label="Add workspace"
+            >
+              <NotebookText className="h-5 w-5 text-warm-gray-600" />
+            </button>
+          </div>
         </div>
         <SearchBar />
       </div>
