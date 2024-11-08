@@ -1,11 +1,24 @@
-import { NotebookText, Plus, Trash2 } from 'lucide-react';
+import { NotebookText, Plus, Trash2, FileUp } from 'lucide-react';
 import { useNoteStore, type Note } from '@/lib/store';
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
+import { toast } from "sonner";
 
 export const Sidebar = () => {
   const { notes, selectedNoteId, addNote, deleteNote, selectNote } = useNoteStore();
   const navigate = useNavigate();
+
+  const handlePdfUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      if (file.type === 'application/pdf') {
+        // For now, just show a success toast. We'll implement actual PDF storage later
+        toast.success('PDF uploaded successfully!');
+      } else {
+        toast.error('Please upload a PDF file');
+      }
+    }
+  };
 
   return (
     <div className="w-64 h-screen border-r border-warm-gray-200 bg-paper flex flex-col">
@@ -30,6 +43,18 @@ export const Sidebar = () => {
             >
               <NotebookText className="h-5 w-5 text-warm-gray-600" />
             </button>
+            <label
+              className="p-1 hover:bg-warm-gray-100 rounded-md transition-colors cursor-pointer"
+              aria-label="Upload PDF"
+            >
+              <FileUp className="h-5 w-5 text-warm-gray-600" />
+              <input
+                type="file"
+                accept=".pdf"
+                onChange={handlePdfUpload}
+                className="hidden"
+              />
+            </label>
           </div>
         </div>
       </div>
