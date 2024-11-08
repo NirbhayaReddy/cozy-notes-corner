@@ -12,7 +12,7 @@ import {
   Book
 } from 'lucide-react';
 import { Editor } from '@tiptap/react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 interface EditorToolbarProps {
   editor: Editor | null;
@@ -23,13 +23,6 @@ interface EditorToolbarProps {
 
 export const EditorToolbar = ({ editor, onAI, onDownload, onShare }: EditorToolbarProps) => {
   const navigate = useNavigate();
-  const location = useLocation();
-
-  const handleHomeClick = () => {
-    if (location.pathname !== '/') {
-      navigate('/');
-    }
-  };
 
   const handleFormat = (format: string) => {
     if (!editor) return;
@@ -56,7 +49,7 @@ export const EditorToolbar = ({ editor, onAI, onDownload, onShare }: EditorToolb
   return (
     <div className="flex items-center justify-between space-x-2 mb-4 border-b pb-4">
       <div className="flex items-center space-x-2">
-        <Button variant="ghost" size="icon" onClick={handleHomeClick}>
+        <Button variant="ghost" size="icon" onClick={() => navigate('/')}>
           <Home className="h-4 w-4" />
         </Button>
         <Button variant="ghost" size="icon" onClick={() => navigate('/all-notes')}>
