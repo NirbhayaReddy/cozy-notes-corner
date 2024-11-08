@@ -9,11 +9,13 @@ import {
   Download, 
   Share2,
   Home,
-  Book
+  Book,
+  LogOut
 } from 'lucide-react';
 import { Editor } from '@tiptap/react';
 import { useNavigate } from 'react-router-dom';
 import { useNoteStore } from '@/lib/store';
+import { supabase } from '@/integrations/supabase/client';
 
 interface EditorToolbarProps {
   editor: Editor | null;
@@ -29,6 +31,11 @@ export const EditorToolbar = ({ editor, onAI, onDownload, onShare }: EditorToolb
   const handleHomeClick = () => {
     setSelectedPdfId(null);
     navigate('/');
+  };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate('/login');
   };
 
   const handleFormat = (format: string) => {
@@ -87,6 +94,9 @@ export const EditorToolbar = ({ editor, onAI, onDownload, onShare }: EditorToolb
         </Button>
         <Button variant="ghost" size="icon" onClick={onShare}>
           <Share2 className="h-4 w-4" />
+        </Button>
+        <Button variant="ghost" size="icon" onClick={handleLogout}>
+          <LogOut className="h-4 w-4" />
         </Button>
       </div>
     </div>
