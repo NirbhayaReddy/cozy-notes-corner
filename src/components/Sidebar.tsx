@@ -1,18 +1,18 @@
 import { NotebookText, Plus, Trash2, FileUp } from 'lucide-react';
-import { useNoteStore, type Note } from '@/lib/store';
+import { useNoteStore } from '@/lib/store';
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import { toast } from "sonner";
 
 export const Sidebar = () => {
-  const { notes, selectedNoteId, addNote, deleteNote, selectNote } = useNoteStore();
+  const { pdfs, addPdf, deletePdf } = useNoteStore();
   const navigate = useNavigate();
 
   const handlePdfUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       if (file.type === 'application/pdf') {
-        // For now, just show a success toast. We'll implement actual PDF storage later
+        addPdf(file);
         toast.success('PDF uploaded successfully!');
       } else {
         toast.error('Please upload a PDF file');
@@ -26,16 +26,9 @@ export const Sidebar = () => {
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-2">
             <NotebookText className="h-6 w-6 text-warm-gray-600" />
-            <h1 className="font-semibold text-warm-gray-800">Notes</h1>
+            <h1 className="font-semibold text-warm-gray-800">PDFs</h1>
           </div>
           <div className="flex items-center space-x-2">
-            <button
-              onClick={() => addNote()}
-              className="p-1 hover:bg-warm-gray-100 rounded-md transition-colors"
-              aria-label="New note"
-            >
-              <Plus className="h-5 w-5 text-warm-gray-600" />
-            </button>
             <button
               onClick={() => navigate('/all-notes')}
               className="p-1 hover:bg-warm-gray-100 rounded-md transition-colors"
@@ -60,31 +53,25 @@ export const Sidebar = () => {
       </div>
       
       <div className="flex-1 overflow-y-auto">
-        {notes.map((note) => (
+        {pdfs.map((pdf) => (
           <div
-            key={note.id}
-            className={`p-4 border-b border-warm-gray-200 cursor-pointer transition-colors ${
-              selectedNoteId === note.id ? 'bg-warm-gray-100' : 'hover:bg-warm-gray-50'
-            }`}
-            onClick={() => selectNote(note.id)}
+            key={pdf.id}
+            className="p-4 border-b border-warm-gray-200 hover:bg-warm-gray-50"
           >
             <div className="flex items-center justify-between">
               <h3 className="font-medium text-warm-gray-800 truncate">
-                {note.title || 'Untitled Note'}
+                {pdf.name}
               </h3>
               <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  deleteNote(note.id);
-                }}
+                onClick={() => deletePdf(pdf.id)}
                 className="p-1 opacity-0 group-hover:opacity-100 hover:bg-warm-gray-200 rounded-md transition-all"
-                aria-label="Delete note"
+                aria-label="Delete PDF"
               >
                 <Trash2 className="h-4 w-4 text-warm-gray-500" />
               </button>
             </div>
             <p className="text-sm text-warm-gray-500 mt-1">
-              {format(note.updatedAt, 'MMM d, yyyy')}
+              {format(pdf.uploadedAt, 'MMM d, yyyy')}
             </p>
           </div>
         ))}

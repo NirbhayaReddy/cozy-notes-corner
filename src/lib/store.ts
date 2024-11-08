@@ -8,17 +8,27 @@ export interface Note {
   updatedAt: Date;
 }
 
+export interface PDF {
+  id: string;
+  name: string;
+  uploadedAt: Date;
+}
+
 interface NoteStore {
   notes: Note[];
+  pdfs: PDF[];
   selectedNoteId: string | null;
   addNote: () => void;
   deleteNote: (id: string) => void;
   updateNote: (id: string, updates: Partial<Omit<Note, 'id' | 'createdAt'>>) => void;
   selectNote: (id: string | null) => void;
+  addPdf: (file: File) => void;
+  deletePdf: (id: string) => void;
 }
 
 export const useNoteStore = create<NoteStore>((set) => ({
   notes: [],
+  pdfs: [],
   selectedNoteId: null,
   
   addNote: () => set((state) => {
@@ -49,4 +59,16 @@ export const useNoteStore = create<NoteStore>((set) => ({
   })),
 
   selectNote: (id) => set({ selectedNoteId: id }),
+
+  addPdf: (file) => set((state) => ({
+    pdfs: [{
+      id: Date.now().toString(),
+      name: file.name,
+      uploadedAt: new Date()
+    }, ...state.pdfs]
+  })),
+
+  deletePdf: (id) => set((state) => ({
+    pdfs: state.pdfs.filter(pdf => pdf.id !== id)
+  })),
 }));
