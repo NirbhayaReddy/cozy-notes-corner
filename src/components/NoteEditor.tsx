@@ -14,56 +14,89 @@ import {
 } from 'lucide-react';
 import { toast } from "sonner";
 import { useNavigate } from 'react-router-dom';
+import { useEditor, EditorContent } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
+import Highlight from '@tiptap/extension-highlight';
+import OpenAI from 'openai';
+
+const openai = new OpenAI({
+  apiKey: import.meta.env.VITE_OPENAI_API_KEY,
+  dangerouslyAllowBrowser: true
+});
 
 export const NoteEditor = () => {
   const { notes, selectedNoteId, updateNote } = useNoteStore();
   const selectedNote = notes.find((note) => note.id === selectedNoteId);
   const navigate = useNavigate();
 
+  const editor = useEditor({
+    extensions: [
+      StarterKit,
+      Highlight,
+    ],
+    content: selectedNote?.content || '',
+    onUpdate: ({ editor }) => {
+      if (selectedNote) {
+        updateNote(selectedNote.id, { content: editor.getHTML() });
+      }
+    },
+  });
+
   const handleFormat = (format: string) => {
-    if (!selectedNote) return;
+    if (!editor) return;
     
-    const textarea = document.querySelector('textarea');
-    if (!textarea) return;
-    
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const text = selectedNote.content;
-    const selectedText = text.slice(start, end);
-    
-    let newText = text;
     switch (format) {
       case 'h1':
-        newText = text.slice(0, start) + '# ' + selectedText + text.slice(end);
+        editor.chain().focus().toggleHeading({ level: 1 }).run();
         break;
       case 'h2':
-        newText = text.slice(0, start) + '## ' + selectedText + text.slice(end);
+        editor.chain().focus().toggleHeading({ level: 2 }).run();
         break;
       case 'bold':
-        newText = text.slice(0, start) + '**' + selectedText + '**' + text.slice(end);
+        editor.chain().focus().toggleBold().run();
         break;
       case 'italic':
-        newText = text.slice(0, start) + '_' + selectedText + '_' + text.slice(end);
+        editor.chain().focus().toggleItalic().run();
         break;
       case 'highlight':
-        newText = text.slice(0, start) + '==' + selectedText + '==' + text.slice(end);
+        editor.chain().focus().toggleHighlight().run();
         break;
     }
-    
-    updateNote(selectedNote.id, { content: newText });
-    
-    // Restore cursor position
-    setTimeout(() => {
-      textarea.focus();
-      textarea.setSelectionRange(
-        start + (format === 'h1' || format === 'h2' ? 2 : 2),
-        end + (format === 'h1' || format === 'h2' ? 2 : 2)
-      );
-    }, 0);
   };
 
-  const handleAI = () => {
-    toast.info("AI Assistant is being called...");
+  const handleAI = async () => {
+    if (!selectedNote?.content || !selectedNote?.pdfId) {
+      toast.error("Please select a note with associated PDF first");
+      return;
+    }
+
+    toast.info("AI Assistant is analyzing your note...");
+
+    try {
+      const completion = await openai.chat.completions.create({
+        model: "gpt-4",
+        messages: [
+          {
+            role: "system",
+            content: "You are a helpful assistant that answers questions based on the content provided."
+          },
+          {
+            role: "user",
+            content: selectedNote.content
+          }
+        ]
+      });
+
+      const response = completion.choices[0]?.message?.content;
+      if (response) {
+        updateNote(selectedNote.id, { 
+          content: selectedNote.content + "\n\nAI Response:\n" + response 
+        });
+        toast.success("AI response added to your note!");
+      }
+    } catch (error) {
+      toast.error("Failed to get AI response. Please try again.");
+    }
   };
 
   const handleDownload = () => {
@@ -79,16 +112,17 @@ export const NoteEditor = () => {
   };
 
   const handleShare = () => {
-    if (navigator.share && selectedNote) {
-      navigator.share({
-        title: selectedNote.title,
-        text: selectedNote.content,
-      }).catch(() => {
-        toast.error("Sharing failed. Please try again.");
-      });
-    } else {
-      toast.error("Sharing is not supported on this device/browser.");
-    }
+    if (!selectedNote) return;
+    
+    // Generate a shareable link
+    const shareableLink = `${window.location.origin}/note/${selectedNote.id}`;
+    
+    // Copy to clipboard
+    navigator.clipboard.writeText(shareableLink).then(() => {
+      toast.success("Link copied to clipboard!");
+    }).catch(() => {
+      toast.error("Failed to copy link.");
+    });
   };
 
   if (!selectedNote) {
@@ -145,11 +179,9 @@ export const NoteEditor = () => {
         placeholder="Untitled Note"
         className="text-2xl font-semibold text-warm-gray-800 bg-transparent border-none outline-none mb-4"
       />
-      <textarea
-        value={selectedNote.content}
-        onChange={(e) => updateNote(selectedNote.id, { content: e.target.value })}
-        placeholder="Start writing..."
-        className="flex-1 text-warm-gray-700 bg-transparent border-none outline-none resize-none"
+      <EditorContent 
+        editor={editor} 
+        className="flex-1 text-warm-gray-700 prose prose-sm max-w-none"
       />
     </div>
   );
